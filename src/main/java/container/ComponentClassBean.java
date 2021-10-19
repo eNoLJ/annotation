@@ -1,18 +1,23 @@
-package Bean;
+package container;
 
 import annotation.Component;
 import annotation.Controller;
 import org.reflections.Reflections;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-public class BeanFactory {
+public class ComponentClassBean {
 
     public final Map<String, Object> beanFactory = new HashMap<>();
 
-    public BeanFactory() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public ComponentClassBean() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         init();
+    }
+
+    public Object getBean(String beanName) {
+        return beanFactory.get(beanName);
     }
 
     private void init() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -20,7 +25,8 @@ public class BeanFactory {
         List<Class<?>> targetClassList;
 
         for (Class<?> componentClass : componentClassList) {
-            targetClassList = findClassByAnnotation();
+            System.out.println(componentClass);
+            targetClassList = findClassByAnnotation(componentClass);
 
             for (Class<?> clazz : targetClassList) {
                 Object newClass = clazz.getConstructor().newInstance();
@@ -35,9 +41,9 @@ public class BeanFactory {
         return new ArrayList<>(classes);
     }
 
-    private List<Class<?>> findClassByAnnotation() {
+    private List<Class<?>> findClassByAnnotation(Class<?> clazz) {
         Reflections reflections = new Reflections("controller");
-        Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class);
+        Set<Class<?>> classes = reflections.getTypesAnnotatedWith((Class<? extends Annotation>) clazz);
         return new ArrayList<>(classes);
     }
 }
